@@ -8,9 +8,12 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace ExcelWs
 {
-    class Interface
+    public class Interface
     {
-        public IEnumerable<List<dynamic>> GetExcelRowEnumerator(int sheetNumber, string path)
+        public static int rowCount { get; private set; }
+        public static int colCount { get; private set; }
+
+        public static IEnumerable<List<dynamic>> GetExcelRowEnumerator(int sheetNumber, string path)
         {
             Excel.Application excelApp = new Excel.Application();
             Excel.Workbook workbook = excelApp.Workbooks.Open(path, ReadOnly: true);
@@ -19,8 +22,8 @@ namespace ExcelWs
             Excel._Worksheet worksheet = (Excel._Worksheet)workbook.Sheets[sheetNumber];
             Excel.Range range = worksheet.UsedRange;
 
-            int rowCount = range.Rows.Count;
-            int colCount = range.Columns.Count;
+            rowCount = range.Rows.Count;
+            colCount = range.Columns.Count;
 
             // Array che conterrà il foglio excel completo
             object[,] valueArray = null;
@@ -42,7 +45,7 @@ namespace ExcelWs
             workbook.Close();
         }
 
-        public void SetExcelRow(string[,] heading, string[,] value, int[] columnsInt = null)
+        public static void SetExcelRow(string[,] heading, string[,] value, int[] columnsInt = null)
         {
             try
             {
