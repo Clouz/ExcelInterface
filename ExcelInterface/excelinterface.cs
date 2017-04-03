@@ -10,13 +10,13 @@ namespace ExcelWs
 {
     class Interface
     {
-        public IEnumerable<List<dynamic>> GetExcelRowEnumerator(int numeroScheda, string path)
+        public IEnumerable<List<dynamic>> GetExcelRowEnumerator(int sheetNumber, string path)
         {
             Excel.Application excelApp = new Excel.Application();
             Excel.Workbook workbook = excelApp.Workbooks.Open(path, ReadOnly: true);
 
             //seleziono la scheda
-            Excel._Worksheet worksheet = (Excel._Worksheet)workbook.Sheets[numeroScheda];
+            Excel._Worksheet worksheet = (Excel._Worksheet)workbook.Sheets[sheetNumber];
             Excel.Range range = worksheet.UsedRange;
 
             int rowCount = range.Rows.Count;
