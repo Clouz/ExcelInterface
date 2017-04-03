@@ -15,7 +15,8 @@ namespace Test
             var x = Interface.GetExcelRowEnumerator(1, args[0]);
 
             string[,] intestazione = {{ "Azione","ID", "Modifica"}};
-            string[,] contenuto = new string[Interface.rowCount, Interface.colCount];
+
+            string[,] contenuto = new string[Interface.rowCount-1, Interface.colCount-1]; 
 
             int i = 0;
             foreach(var xx in x)
@@ -31,7 +32,7 @@ namespace Test
                 Console.WriteLine();
             }
 
-            //Interface.SetExcelRow();
+            Interface.SetExcelRow(intestazione, contenuto);
 
             Console.ReadLine();
         }
