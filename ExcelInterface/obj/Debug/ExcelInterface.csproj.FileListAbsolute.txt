@@ -1,0 +1,5 @@
+C:\GitHub\ExcelInterface\ExcelInterface\bin\Debug\ExcelInterface.dll
+C:\GitHub\ExcelInterface\ExcelInterface\bin\Debug\ExcelInterface.pdb
+C:\GitHub\ExcelInterface\ExcelInterface\obj\Debug\ExcelInterface.csprojResolveAssemblyReference.cache
+C:\GitHub\ExcelInterface\ExcelInterface\obj\Debug\ExcelInterface.dll
+C:\GitHub\ExcelInterface\ExcelInterface\obj\Debug\ExcelInterface.pdb
