@@ -98,38 +98,25 @@ namespace ExcelWs
                 Excel._Worksheet workSheet = (Excel.Worksheet)excelApp.ActiveSheet;
 
                 var dataType = data.GetType();
-                var info = dataType.GetMethods();
+                var info = dataType.GetProperties();
                 int collumn = info.Count();
                 int row = data.Count()+1;
-
                 
-
                 //scrivo l'intestazione
                 Excel.Range testa = workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[1, collumn]];
-                testa.Value2 = ListToArray(info.ToList());
+                testa.Value2 = ListToArray(info.Select(a => a.Name).ToList());
 
                 //scrivo il contenuto
                 Excel.Range corpo = workSheet.Range[workSheet.Cells[2, 1], workSheet.Cells[row, collumn]];
-                corpo.Value2 = data.ToArray();
+                corpo.Value2 = ListToArray(data.ToList());
 
                 workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[1, collumn]].Font.Bold = true;
                 workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[row, collumn]].Cells.VerticalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
                 workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[row, collumn]].Cells.HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
                 workSheet.Range[workSheet.Columns[1], workSheet.Columns[collumn]].AutoFit();
 
-                /*
-                if (columnsInt != null)
-                {
-                    foreach (var item in columnsInt)
-                    {
-                        workSheet.Columns[item].NumberFormat = "0";
-                    }
-                }
-                */
-
                 //rende l'oggetto visibile
                 excelApp.Visible = true;
-
             }
             catch (Exception ex)
             {
@@ -137,25 +124,32 @@ namespace ExcelWs
             }
         }
 
-        private string[,] ListToArray(List<string> list)
+        static private string[,] ListToArray(List<string> list)
         {
-            string[,] elements = new string[0,list.Count()];
+            string[,] elements = new string[list.Count(),0];
 
             for (int i = 0; i < list.Count(); i++)
             {
-                elements[0, i] = list[i];
+                elements[i, 0] = list[i];
             }
 
             return elements;
         }
 
-        private string[,] ListToArray(List<object> list)
+        static private string[,] ListToArray(List<object> list)
         {
-            string[,] elements = new string[0, list.Count()];
+            var colonne = list.GetType().GetProperties().Select(x => x.Name);
+
+            string[,] elements = new string[list.Count(), colonne.Count()];
 
             for (int i = 0; i < list.Count(); i++)
             {
-                elements[0, i] = list[i];
+                int ii = 0;
+                foreach (var item in colonne)
+                {
+                    elements[i, ii] = list.ElementAt(i).GetType().GetProperty(item).ToString();
+                    ii++;
+                }
             }
 
             return elements;

@@ -14,27 +14,27 @@ namespace Test
         {
             var x = Interface.GetExcelRowEnumerator(1, args[0]);
 
-            string[,] intestazione = {{ "Azione","ID", "Modifica"}};
+            List<Prova> prova = new List<Prova>();
 
-            string[,] contenuto = new string[Interface.rowCount-1, Interface.colCount-1]; 
-
-            int i = 0;
-            foreach(var xx in x)
+            for (int i = 0; i < x.Count(); i++)
             {
-                int ii = 0;
-                foreach (var item in xx)
-                {
-                    Console.Write($"{item}\t");
-                    contenuto[i, ii] = item;
-                    ii++;
-                }
-                i++;
-                Console.WriteLine();
+                prova.Add(new Prova {
+                    col1 = x.ElementAt(i).ElementAt(0),
+                    col2 = x.ElementAt(i).ElementAt(1)
+                });
             }
 
-            Interface.SetExcelRow(intestazione, contenuto);
+            Interface.SetExcelRow(prova);
+
 
             Console.ReadLine();
+        }
+
+
+        public class Prova
+        {
+            public string col1 { get; set; }
+            public string col2 { get; set; }
         }
     }
 }
