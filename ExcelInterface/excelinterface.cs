@@ -91,46 +91,29 @@ namespace ExcelWs
 
         public static void SetExcelRow<T>(List<T> data)
         {
-            //TEST
-            /*
+            Excel.Application excelApp = new Excel.Application();
+            excelApp.Workbooks.Add();
+            Excel._Worksheet workSheet = (Excel.Worksheet)excelApp.ActiveSheet;
+
             var prop = typeof(T).GetProperties();
-
-            foreach (var item in prop)
-            {
-                Console.WriteLine(item.Name);
-            }
-
-            foreach (var item in data)
-            {
-                foreach (var item2 in prop)
-                {
-                    Console.Write(item2.GetValue(item));
-                }
-            }*/
-
-                Excel.Application excelApp = new Excel.Application();
-                excelApp.Workbooks.Add();
-                Excel._Worksheet workSheet = (Excel.Worksheet)excelApp.ActiveSheet;
-
-                var prop = typeof(T).GetProperties();
-                int collumn = prop.Count();
-                int row = data.Count()+1;
+            int collumn = prop.Count();
+            int row = data.Count()+1;
                 
-                //scrivo l'intestazione
-                Excel.Range testa = workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[1, collumn]];
-                testa.Value2 = ListToArray(prop.Select(x => x.Name).ToList());
+            //scrivo l'intestazione
+            Excel.Range head = workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[1, collumn]];
+            head.Value2 = ListToArray(prop.Select(x => x.Name).ToList());
 
-                //scrivo il contenuto
-                Excel.Range corpo = workSheet.Range[workSheet.Cells[2, 1], workSheet.Cells[row, collumn]];
-                corpo.Value2 = ListToArray(data);
+            //scrivo il contenuto
+            Excel.Range body = workSheet.Range[workSheet.Cells[2, 1], workSheet.Cells[row, collumn]];
+            body.Value2 = ListToArray(data);
 
-                workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[1, collumn]].Font.Bold = true;
-                workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[row, collumn]].Cells.VerticalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
-                workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[row, collumn]].Cells.HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
-                workSheet.Range[workSheet.Columns[1], workSheet.Columns[collumn]].AutoFit();
+            workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[1, collumn]].Font.Bold = true;
+            workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[row, collumn]].Cells.VerticalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
+            workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[row, collumn]].Cells.HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
+            workSheet.Range[workSheet.Columns[1], workSheet.Columns[collumn]].AutoFit();
 
-                //rende l'oggetto visibile
-                excelApp.Visible = true;
+            //rende l'oggetto visibile
+            excelApp.Visible = true;
             try
             {
 
@@ -140,33 +123,32 @@ namespace ExcelWs
                 Console.WriteLine(ex.ToString());
             }
         }
-
-        static private string[,] ListToArray(List<string> list)
+        
+        static public string[,] ListToArray(List<string> list)
         {
 
-            string[,] elements = new string[list.Count(),0];
+            string[,] elements = new string[list.Count(),1];
 
             for (int i = 0; i < list.Count(); i++)
             {
-                Console.WriteLine($"i:{i}\tlist:{list[i]}\telement:{elements[0,0]}");
-                elements[i, 0] = list[i];
+                elements[i, 0] = list.ElementAt(i);
             }
 
             return elements;
         }
 
-        static private string[,] ListToArray<T>(List<T> list)
+        static public string[,] ListToArray<T>(List<T> list)
         {
-            var colonne = list.GetType().GetProperties().Select(x => x.Name);
+            var props = typeof(T).GetProperties();
 
-            string[,] elements = new string[list.Count(), colonne.Count()];
+            string[,] elements = new string[list.Count(), props.Count()];
 
             for (int i = 0; i < list.Count(); i++)
             {
                 int ii = 0;
-                foreach (var item in colonne)
+                foreach (var prop in props)
                 {
-                    elements[i, ii] = list.ElementAt(i).GetType().GetProperty(item).ToString();
+                    elements[i, ii] = prop.GetValue(list.ElementAt(i)).ToString();
                     ii++;
                 }
             }

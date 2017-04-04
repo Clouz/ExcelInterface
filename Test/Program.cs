@@ -24,6 +24,8 @@ namespace Test
                 });
             }
 
+            var x = Interface.ListToArray(prova);
+
             Interface.SetExcelRow<Prova>(prova);
 
             Console.ReadLine();
