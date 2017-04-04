@@ -89,7 +89,7 @@ namespace ExcelWs
             }
         }
 
-        public static void SetExcelRow(List<object> data)
+        public static void SetExcelRow<T>(List<T> data)
         {
             try
             {
@@ -136,7 +136,7 @@ namespace ExcelWs
             return elements;
         }
 
-        static private string[,] ListToArray(List<object> list)
+        static private string[,] ListToArray<T>(List<T> list)
         {
             var colonne = list.GetType().GetProperties().Select(x => x.Name);
 
