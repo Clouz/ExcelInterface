@@ -91,24 +91,38 @@ namespace ExcelWs
 
         public static void SetExcelRow<T>(List<T> data)
         {
-            try
+            //TEST
+            /*
+            var prop = typeof(T).GetProperties();
+
+            foreach (var item in prop)
             {
+                Console.WriteLine(item.Name);
+            }
+
+            foreach (var item in data)
+            {
+                foreach (var item2 in prop)
+                {
+                    Console.Write(item2.GetValue(item));
+                }
+            }*/
+
                 Excel.Application excelApp = new Excel.Application();
                 excelApp.Workbooks.Add();
                 Excel._Worksheet workSheet = (Excel.Worksheet)excelApp.ActiveSheet;
 
-                var dataType = data.GetType();
-                var info = dataType.GetProperties();
-                int collumn = info.Count();
+                var prop = typeof(T).GetProperties();
+                int collumn = prop.Count();
                 int row = data.Count()+1;
                 
                 //scrivo l'intestazione
                 Excel.Range testa = workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[1, collumn]];
-                testa.Value2 = ListToArray(info.Select(a => a.Name).ToList());
+                testa.Value2 = ListToArray(prop.Select(x => x.Name).ToList());
 
                 //scrivo il contenuto
                 Excel.Range corpo = workSheet.Range[workSheet.Cells[2, 1], workSheet.Cells[row, collumn]];
-                corpo.Value2 = ListToArray(data.ToList());
+                corpo.Value2 = ListToArray(data);
 
                 workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[1, collumn]].Font.Bold = true;
                 workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[row, collumn]].Cells.VerticalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
@@ -117,6 +131,9 @@ namespace ExcelWs
 
                 //rende l'oggetto visibile
                 excelApp.Visible = true;
+            try
+            {
+
             }
             catch (Exception ex)
             {
@@ -126,10 +143,12 @@ namespace ExcelWs
 
         static private string[,] ListToArray(List<string> list)
         {
+
             string[,] elements = new string[list.Count(),0];
 
             for (int i = 0; i < list.Count(); i++)
             {
+                Console.WriteLine($"i:{i}\tlist:{list[i]}\telement:{elements[0,0]}");
                 elements[i, 0] = list[i];
             }
 
