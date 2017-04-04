@@ -16,18 +16,18 @@ namespace Test
 
             List<Prova> prova = new List<Prova>();
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 500; i++)
             {
                 prova.Add(new Prova {
                     Nome = $"Claudio {i}",
-                    Cognome = $"Mola {i*i}"
+                    Cognome = $"Mola {i+i}",
+                    Telefono = i
                 });
             }
 
-            var x = Interface.ListToArray(prova);
-
             Interface.SetExcelRow<Prova>(prova);
-
+            Console.WriteLine($"Creating time: {Interface.ExcelSetTime.Elapsed}");
+            
             Console.ReadLine();
         }
 

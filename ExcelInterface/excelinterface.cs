@@ -4,17 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Excel = Microsoft.Office.Interop.Excel;
-
+using System.Diagnostics;
 
 namespace ExcelWs
 {
-    public class Interface
+    public static class Interface
     {
-        public static int rowCount { get; private set; }
-        public static int colCount { get; private set; }
+        public static int RowCount { get; private set; }
+        public static int ColCount { get; private set; }
+
+        public static Stopwatch ExcelGetTime { get; private set; } = new Stopwatch();
+        public static Stopwatch ExcelSetTime { get; private set; } = new Stopwatch();
 
         public static IEnumerable<List<dynamic>> GetExcelRowEnumerator(int sheetNumber, string path)
         {
+            //Start timer
+            ExcelGetTime.Start();
+
             Excel.Application excelApp = new Excel.Application();
             Excel.Workbook workbook = excelApp.Workbooks.Open(path, ReadOnly: true);
 
@@ -22,8 +28,8 @@ namespace ExcelWs
             Excel._Worksheet worksheet = (Excel._Worksheet)workbook.Sheets[sheetNumber];
             Excel.Range range = worksheet.UsedRange;
 
-            rowCount = range.Rows.Count;
-            colCount = range.Columns.Count;
+            RowCount = range.Rows.Count;
+            ColCount = range.Columns.Count;
 
             // Array che conterrà il foglio excel completo
             object[,] valueArray = null;
@@ -43,80 +49,45 @@ namespace ExcelWs
             }
 
             workbook.Close();
-        }
 
-        public static void SetExcelRow(string[,] heading, string[,] value, int[] columnsInt = null)
-        {
-            try
-            {
-                Excel.Application excelApp = new Excel.Application();
-
-                excelApp.Workbooks.Add();
-                Excel._Worksheet workSheet = (Excel.Worksheet)excelApp.ActiveSheet;
-
-                int colonne = heading.Length;
-                int elementiTotali = value.Length;
-                int righe = elementiTotali / colonne + 1;
-
-                //scrivo l'intestazione
-                Excel.Range testa = workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[1, colonne]];
-                testa.Value2 = heading;
-
-                //scrivo il contenuto
-                Excel.Range corpo = workSheet.Range[workSheet.Cells[2, 1], workSheet.Cells[righe, colonne]];
-                corpo.Value2 = value;
-
-                workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[1, colonne]].Font.Bold = true;
-                workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[righe, colonne]].Cells.VerticalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
-                workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[righe, colonne]].Cells.HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
-                workSheet.Range[workSheet.Columns[1], workSheet.Columns[colonne]].AutoFit();
-
-                if (columnsInt != null)
-                {
-                    foreach (var item in columnsInt)
-                    {
-                        workSheet.Columns[item].NumberFormat = "0";
-                    }
-                }
-
-                //rende l'oggetto visibile
-                excelApp.Visible = true;
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
+            //stop timer
+            ExcelGetTime.Stop();
         }
 
         public static void SetExcelRow<T>(List<T> data)
         {
-            Excel.Application excelApp = new Excel.Application();
-            excelApp.Workbooks.Add();
-            Excel._Worksheet workSheet = (Excel.Worksheet)excelApp.ActiveSheet;
-
-            var prop = typeof(T).GetProperties();
-            int collumn = prop.Count();
-            int row = data.Count()+1;
-                
-            //scrivo l'intestazione
-            Excel.Range head = workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[1, collumn]];
-            var prova = ListToArray(prop.Select(x => x.Name).ToList());
-            head.Value2 = prova;
-
-            //scrivo il contenuto
-            Excel.Range body = workSheet.Range[workSheet.Cells[2, 1], workSheet.Cells[row, collumn]];
-            body.Value2 = ListToArray(data);
-
-            workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[1, collumn]].Font.Bold = true;
-            workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[row, collumn]].Cells.VerticalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
-            workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[row, collumn]].Cells.HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
-            workSheet.Range[workSheet.Columns[1], workSheet.Columns[collumn]].AutoFit();
-
-            //rende l'oggetto visibile
-            excelApp.Visible = true;
             try
             {
+                //start timer
+                ExcelSetTime.Start();
+
+                Excel.Application excelApp = new Excel.Application();
+                excelApp.Workbooks.Add();
+                Excel._Worksheet workSheet = (Excel.Worksheet)excelApp.ActiveSheet;
+
+                var prop = typeof(T).GetProperties();
+                int collumn = prop.Count();
+                int row = data.Count()+1;
+                
+                //scrivo l'intestazione
+                Excel.Range head = workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[1, collumn]];
+                var prova = ListToArray(prop.Select(x => x.Name).ToList());
+                head.Value2 = prova;
+
+                //scrivo il contenuto
+                Excel.Range body = workSheet.Range[workSheet.Cells[2, 1], workSheet.Cells[row, collumn]];
+                body.Value2 = ListToArray(data);
+
+                workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[1, collumn]].Font.Bold = true;
+                workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[row, collumn]].Cells.VerticalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
+                workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[row, collumn]].Cells.HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
+                workSheet.Range[workSheet.Columns[1], workSheet.Columns[collumn]].AutoFit();
+
+                //rende l'oggetto visibile
+                excelApp.Visible = true;
+
+                //stop timer
+                ExcelSetTime.Stop();
 
             }
             catch (Exception ex)
