@@ -19,8 +19,8 @@ namespace Test
             for (int i = 0; i < 10; i++)
             {
                 prova.Add(new Prova {
-                    col1 = i,
-                    col2 = i*i
+                    Nome = $"Claudio {i}",
+                    Cognome = $"Mola {i*i}"
                 });
             }
 
@@ -34,8 +34,9 @@ namespace Test
 
         public class Prova
         {
-            public int col1 { get; set; }
-            public int col2 { get; set; }
+            public string Nome { get; set; }
+            public string Cognome { get; set; }
+            public int Telefono { get; set; }
         }
     }
 }

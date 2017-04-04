@@ -101,7 +101,8 @@ namespace ExcelWs
                 
             //scrivo l'intestazione
             Excel.Range head = workSheet.Range[workSheet.Cells[1, 1], workSheet.Cells[1, collumn]];
-            head.Value2 = ListToArray(prop.Select(x => x.Name).ToList());
+            var prova = ListToArray(prop.Select(x => x.Name).ToList());
+            head.Value2 = prova;
 
             //scrivo il contenuto
             Excel.Range body = workSheet.Range[workSheet.Cells[2, 1], workSheet.Cells[row, collumn]];
@@ -127,11 +128,11 @@ namespace ExcelWs
         static public string[,] ListToArray(List<string> list)
         {
 
-            string[,] elements = new string[list.Count(),1];
+            string[,] elements = new string[1, list.Count()];
 
             for (int i = 0; i < list.Count(); i++)
             {
-                elements[i, 0] = list.ElementAt(i);
+                elements[0, i] = list.ElementAt(i);
             }
 
             return elements;
