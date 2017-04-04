@@ -12,22 +12,21 @@ namespace Test
     {
         static void Main(string[] args)
         {
-            //var x = Interface.GetExcelRowEnumerator(1, args[0]);
+            var x = Interface.GetExcelRowEnumerator(1, args[0]);
 
-            List<Prova> prova = new List<Prova>();
+            List<Prova> lista = new List<Prova>();
 
-            for (int i = 0; i < 500; i++)
+            foreach (var item in x)
             {
-                prova.Add(new Prova {
-                    Nome = $"Claudio {i}",
-                    Cognome = $"Mola {i+i}",
-                    Telefono = i
+                lista.Add(new Prova() {
+                    Nome = item[1],
+                    Telefono = (int)item[0]
                 });
             }
 
-            Interface.SetExcelRow<Prova>(prova);
+            Interface.SetExcelRow<Prova>(lista);
             Console.WriteLine($"Creating time: {Interface.ExcelSetTime.Elapsed}");
-            
+
             Console.ReadLine();
         }
 
@@ -35,7 +34,6 @@ namespace Test
         public class Prova
         {
             public string Nome { get; set; }
-            public string Cognome { get; set; }
             public int Telefono { get; set; }
         }
     }
