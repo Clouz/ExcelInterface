@@ -21,7 +21,7 @@ public static void SetExcelRow<T>(List<T> data)
 ```
 Example:
 ```cs
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,8 +36,8 @@ namespace Test
             List<Person> Users = new List<Person>();
 
             for(int i = 0; i < 10; i++) {
-                lista.Add(new Person() {
-                    Id = (int)item[0],
+                Users.Add(new Person() {
+                    Id = i,
                     Name = "Claudio"
                 });
             }
