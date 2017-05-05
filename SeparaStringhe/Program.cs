@@ -15,7 +15,7 @@ namespace SeparaStringhe
         static int NumeroRiga { get; set; }
 
         static char Separatore { get; set; }
-        static string CarattereRiempimento { get; set; }
+        static char CarattereRiempimento { get; set; }
         static string Pattern { get; set; }
         static string [] PatternDiviso { get; set; }
 
@@ -36,61 +36,83 @@ namespace SeparaStringhe
                 return 1;
             }
 
-
-            LeggiConfig();
-            var excel = Interface.GetExcelRowEnumerator(NumeroScheda, PercorsoFile, NumeroRiga);
-
-            foreach (var item in excel)
-                ColonnaExcel.Add(new Conversione {
-                    NomeOriginale = (string)item[NumeroColonna - 1]
-                });
-
-            foreach (var item in ColonnaExcel)
+            try
             {
-                item.NomeModificato = separa(item.NomeOriginale);
+                LeggiConfig();
+                var excel = Interface.GetExcelRowEnumerator(NumeroScheda, PercorsoFile, NumeroRiga);
+
+                foreach (var item in excel)
+                    ColonnaExcel.Add(new Conversione {
+                        NomeOriginale = (string)item[NumeroColonna - 1]
+                    });
+
+                foreach (var item in ColonnaExcel)
+                {
+                    item.NomeModificato = separa(item.NomeOriginale);
+                }
+
+                Interface.SetExcelRow<Conversione>(ColonnaExcel);
+
+                Console.WriteLine("Operazione completata, premere invio per chiudere");
+                Console.ReadLine();
+                return 0;
             }
-
-            Interface.SetExcelRow<Conversione>(ColonnaExcel);
-
-
-            Console.ReadLine();
-            return 0;
-
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error: {e.ToString()}");
+                return 1;
+            }
         }
 
         public static string separa(string nome)
         {
-            var lista = nome.Split(Separatore);
-
-            int indice = 0;
-
-            string nuovaStringa = "";
-
-            foreach (var item in lista)
+            try
             {
-                nuovaStringa = nuovaStringa + item;
+                var lista = nome.Split(Separatore);
+            
+                string nuovaStringa = "";
 
-                for (int i = item.Length; i < PatternDiviso[indice].Length; i++)
+                for (int i = 0; i < lista.Length; i++)
                 {
-                    nuovaStringa = nuovaStringa + CarattereRiempimento;
-                }
-                indice++;
+                    int quantitaSpazi;
+                    try
+                    {
+                        if (int.Parse(PatternDiviso[i]) == 0)
+                        {
+                            quantitaSpazi = 0;
+                        }
+                        else
+                        {
+                            quantitaSpazi = int.Parse(PatternDiviso[i]) - lista[i].Length;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        quantitaSpazi = 0;
+                    }
 
-                nuovaStringa = nuovaStringa + Separatore;
+                    nuovaStringa = nuovaStringa + new string(CarattereRiempimento, quantitaSpazi) + lista[i] + Separatore;
+                }
+                nuovaStringa = nuovaStringa.Substring(0,nuovaStringa.Length -1);
+
+                return nuovaStringa;
+            }
+            catch(Exception e)
+            {
+                return $"Stringa non corrispondente al pattern: {e.ToString()}";
             }
 
-            return "";
         }
 
         public static void LeggiConfig()
         {
             NumeroScheda = int.Parse(ConfigurationManager.AppSettings["NumeroScheda"]);
             NumeroColonna = int.Parse(ConfigurationManager.AppSettings["NumeroColonna"]);
-            NumeroRiga = int.Parse(ConfigurationManager.AppSettings["NumeroRiga"]);
+            NumeroRiga = int.Parse(ConfigurationManager.AppSettings["NumeroRigaIniziale"]);
 
-            Separatore = char.Parse(ConfigurationManager.AppSettings["Separatore"]);
-            CarattereRiempimento = ConfigurationManager.AppSettings["CarattereRiempimento"];
-            Pattern = ConfigurationManager.AppSettings["NumeroRiga"];
+            Separatore = char.Parse(ConfigurationManager.AppSettings["CarattereSeparatore"]);
+            CarattereRiempimento = char.Parse(ConfigurationManager.AppSettings["CarattereRiempimento"]);
+            Pattern = ConfigurationManager.AppSettings["Pattern"];
 
             PatternDiviso = Pattern.Split(Separatore);
 
